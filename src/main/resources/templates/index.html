@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Timely</title>
+        <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
+    </head>
+    <body>
+        <h1>Timely</h1>
+        <div class="container pt-3">
+            <form method="post" th:action="@{/Start}">
+                <button type="submit" class="btn btn-primary">
+                    Start
+                </button>
+            </form>
+        </div>
+
+    </body>
+</html>
