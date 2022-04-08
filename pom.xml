@@ -14,6 +14,10 @@
     <name>Timely</name>
     <description>Timely</description>
     <properties>
+        <bootstrap.version>4.0.0-2</bootstrap.version>
+        <webjars-locator.version>0.30</webjars-locator.version>
+        <lombok.version>1.18.2</lombok.version>
+        <commonmark.version>0.13.1</commonmark.version>
         <java.version>11</java.version>
         <repackage.classifier/>
         <spring-native.version>0.11.4</spring-native.version>
@@ -66,6 +70,17 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>${bootstrap.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>webjars-locator</artifactId>
+            <version>${webjars-locator.version}</version>
         </dependency>
     </dependencies>
 

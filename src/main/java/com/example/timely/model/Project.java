@@ -1,4 +1,4 @@
-package com.example.timely;
+package com.example.timely.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +17,8 @@ public class Project {
 	private Integer id;
 
 	private String name;
-	private String start_time;
-	private String stop_time;
-	private String duration;
+	private String start;
+	private String stop;
+	private long duration;
+	private Boolean Completed = false;
 }

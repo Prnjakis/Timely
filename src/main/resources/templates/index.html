@@ -1,19 +1,85 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
         <title>Timely</title>
         <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
+
     </head>
     <body>
         <h1>Timely</h1>
         <div class="container pt-3">
-            <form method="post" th:action="@{/Start}">
-                <button type="submit" class="btn btn-primary">
-                    Start
-                </button>
-            </form>
+            <div th:if="${completed} == false">
+
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Modal">
+                        Stop
+                    </button>
+            </div>
+            <div th:unless="${completed} == false">
+                <form method="post" th:action="@{/Start}">
+                    <button type="submit" class="btn btn-primary">
+                        Start
+                    </button>
+                </form>
+            </div>
         </div>
+        <table>
+            <tr th:each="project: ${projects}">
+                <div th:if="${project.getName()}">
+                    <td th:text="${project.getName()}"></td>
+                </div>
+                <div th:unless="${project.getName()}">
+                    <td>...</td>
+                </div>
+
+                <td th:text="${project.getStart()}"></td>
+
+                <div th:if="${project.getStop()}">
+                    <td th:text="${project.getStop()}"></td>
+                </div>
+                <div th:unless="${project.getStop()}">
+                    <td>...</td>
+                </div>
+
+                <div th:if="${project.getDuration()}">
+                    <td th:text="${project.getDuration()}"></td>
+                </div>
+                <div th:unless="${project.getDuration()}">
+                    <td>...</td>
+                </div>
+
+            </tr>
+        </table>
+
+
+        <!-- Modal -->
+        <div id = "Modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title justify-content-center" id="ModalTitle">Stop Timer</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h6 class="modal-title" id="ModalLabel">Project name*</h6>
+                        <br>
+                        <form method="post" th:action="@{/Stop}" th:object="${String}">
+                            <input type="text" class="form-control mr-sm-2" th:value="${name}" name="name"/>
+                            <div class="modal-footer justify-content-center">
+                                <button type="submit" class="btn btn-primary">Stop Timer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+        <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+        <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+
 
     </body>
 </html>
