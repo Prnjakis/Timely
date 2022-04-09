@@ -8,48 +8,68 @@
     </head>
     <body>
         <h1>Timely</h1>
-        <div class="container pt-3">
-            <div th:if="${completed} == false">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 mt-5 mb-5">
+                    <div th:if="${completed} == false">
 
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Modal">
-                        Stop
-                    </button>
-            </div>
-            <div th:unless="${completed} == false">
-                <form method="post" th:action="@{/Start}">
-                    <button type="submit" class="btn btn-primary">
-                        Start
-                    </button>
-                </form>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Modal">
+                                Stop
+                            </button>
+                    </div>
+                    <div th:unless="${completed} == false">
+                        <form method="post" th:action="@{/Start}">
+                            <button type="submit" class="btn btn-primary">
+                                Start
+                            </button>
+                        </form>
+                    </div>
+
+                    <table id="table" class="table table-bordered" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <th>Project name</th>
+                            <th>Start date</th>
+                            <th>Stop date</th>
+                            <th>Duration</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="project: ${projects.page.content}">
+
+                            <td th:text="${project.getName()}"></td>
+                            <td th:text="${project.getStart()}"></td>
+                            <td th:text="${project.getStop()}"></td>
+                            <td th:text="${project.getDuration()}"></td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <nav aria-label="Page navigation" class="paging">
+                        <ul class="pagination" th:if="${projects.page.getTotalPages() > 1}">
+                            <li class="page-item" th:classappend="${!projects.paging.isPrevEnabled()? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{'/?pageNumber=' + ${projects.paging.pageNumber - 1}}"
+                                   tabindex="-1">Previous</a>
+                            </li>
+                            <th:block th:each="item : ${projects.paging.getItems()}">
+                                <li class="page-item" th:classappend="${item.index == projects.paging.pageNumber? 'active' : ''}"
+                                    th:if="${item.pageItemType.name() == 'PAGE'}">
+                                    <a class="page-link" th:href="@{'/?pageNumber=' + ${item.index}}"
+                                       th:text="${item.index}"></a>
+                                </li>
+                                <li class="page-item disabled" th:if="${item.pageItemType.name() == 'DOTS'}">
+                                    <a class="page-link" href="#">...</a>
+                                </li>
+                            </th:block>
+                            <li class="page-item" th:classappend="${!projects.paging.isNextEnabled()? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{'/?pageNumber=' + ${projects.paging.pageNumber+1}}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
-        <table>
-            <tr th:each="project: ${projects}">
-                <div th:if="${project.getName()}">
-                    <td th:text="${project.getName()}"></td>
-                </div>
-                <div th:unless="${project.getName()}">
-                    <td>...</td>
-                </div>
-
-                <td th:text="${project.getStart()}"></td>
-
-                <div th:if="${project.getStop()}">
-                    <td th:text="${project.getStop()}"></td>
-                </div>
-                <div th:unless="${project.getStop()}">
-                    <td>...</td>
-                </div>
-
-                <div th:if="${project.getDuration()}">
-                    <td th:text="${project.getDuration()}"></td>
-                </div>
-                <div th:unless="${project.getDuration()}">
-                    <td>...</td>
-                </div>
-
-            </tr>
-        </table>
 
 
         <!-- Modal -->

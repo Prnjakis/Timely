@@ -2,20 +2,16 @@ package com.example.timely.controller;
 
 import com.example.timely.model.Project;
 import com.example.timely.repository.ProjectRepository;
+import com.example.timely.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DateTimeException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 @Controller
 public class MainController {
@@ -23,9 +19,12 @@ public class MainController {
 	@Autowired
 	ProjectRepository projectRepository;
 
-	@GetMapping("/")
-	public String home(Model model) {
-		model.addAttribute("projects", projectRepository.findAll());
+	@Autowired
+	ProjectService projectService;
+
+	@RequestMapping("/")
+	public String home(@RequestParam(value = "pageNumber", required = false, defaultValue = "1") int pageNumber, @RequestParam(value = "size", required = false, defaultValue = "10") int size, Model model) {
+		model.addAttribute("projects", projectService.getProjects(pageNumber,size));
 		if (projectRepository.findAll().isEmpty())
 		{
 			model.addAttribute("completed",true);
@@ -39,8 +38,10 @@ public class MainController {
 		return "index";
 	}
 
-	@PostMapping("/Start")
-	public String start(Model model) {
+
+	@RequestMapping("/Start")
+	public String start(@RequestParam(value = "pageNumber", required = false, defaultValue = "1") int pageNumber, @RequestParam(value = "size", required = false, defaultValue = "10") int size,Model model) {
+
 		Calendar calendar = Calendar.getInstance();
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		Project project = new Project();
@@ -56,14 +57,14 @@ public class MainController {
 			Project completed = projectRepository.findAll().get(projectRepository.findAll().size()-1);
 			model.addAttribute("completed",completed.getCompleted());
 		}
+		model.addAttribute("projects", projectService.getProjects(pageNumber,size));
 		model.addAttribute("name",new String());
-		model.addAttribute("projects", projectRepository.findAll());
 		return "redirect:/";
 
 	}
 
-	@PostMapping("/Stop")
-	public String stop(Model model,@ModelAttribute("name")String name) throws ParseException {
+	@RequestMapping("/Stop")
+	public String stop(@RequestParam(value = "pageNumber", required = false, defaultValue = "1") int pageNumber, @RequestParam(value = "size", required = false, defaultValue = "10") int size,Model model,@ModelAttribute("name")String name) throws ParseException {
 		Calendar calendar = Calendar.getInstance();
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		Project project = projectRepository.findAll().get(projectRepository.findAll().size()-1);
@@ -76,9 +77,9 @@ public class MainController {
 		Date date1 = formatter.parse(time1);
 		Date date2 = formatter.parse(time2);
 		long difference = date2.getTime() - date1.getTime();
-		project.setDuration(difference);
+		project.setDuration(Long.toString(difference));
 		projectRepository.save(project);
-		model.addAttribute("projects", projectRepository.findAll());
+		model.addAttribute("projects", projectService.getProjects(pageNumber,size));
 		model.addAttribute("completed",true);
 		return "redirect:/";
 	}

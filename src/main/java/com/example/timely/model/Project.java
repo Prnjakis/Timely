@@ -16,9 +16,9 @@ public class Project {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
-	private String name;
-	private String start;
-	private String stop;
-	private long duration;
+	private String name = "...";
+	private String start = "...";
+	private String stop = "...";
+	private String duration = "...";
 	private Boolean Completed = false;
 }
