@@ -4,27 +4,38 @@
         <meta charset="UTF-8">
         <title>Timely</title>
         <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
-
+        <link
+                th:rel="stylesheet"
+                th:href="@{webjars/bootstrap-icons/1.3.0/font/bootstrap-icons.css}"
+        />
     </head>
     <body>
-        <h1>Timely</h1>
+        <h1 style="padding: 10px 20px">Timely</h1>
         <div class="container">
             <div class="row">
-                <div class="col-lg-10 mt-5 mb-5">
-                    <div th:if="${completed} == false">
-
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Modal">
-                                Stop
-                            </button>
+                <div class="col-lg-10">
+                    <div  class="d-flex justify-content-center" th:if="${completed} == false">
+                        <button type="button" class="btn btn-primary btn-xl" data-toggle="modal" data-target="#StopModal" style="padding: 10px 40px;font-size: 20px;border-radius: 10px;">
+                            Stop
+                        </button>
                     </div>
-                    <div th:unless="${completed} == false">
+                    <div class="d-flex justify-content-center" th:unless="${completed} == false">
                         <form method="post" th:action="@{/Start}">
-                            <button type="submit" class="btn btn-primary">
-                                Start
-                            </button>
+                            <div th:if="${!projects.page.content.isEmpty()}">
+                                <button type="submit" class="btn btn-primary btn-xl"  style="padding: 10px 40px;font-size: 20px;border-radius: 10px;">
+                                    Start
+                                </button>
+                            </div>
+                            <div  th:unless="${!projects.page.content.isEmpty()}" style="position: absolute;top: 125%;transform: translate( +0%, +125%);width: 100px;height: 100px;">
+                                <button type="submit" class="btn btn-primary btn-xl align-self-center"  style=" padding: 15px 60px;font-size: 30px;border-radius: 15px;">
+                                    Start
+                                </button>
+                            </div>
+
                         </form>
                     </div>
-
+                </div>
+                <div th:if="${!projects.page.content.isEmpty()}" class="col-lg-10 mt-5 mb-5">
                     <table id="table" class="table table-bordered" style="width: 100%">
                         <thead>
                         <tr>
@@ -32,6 +43,7 @@
                             <th>Start date</th>
                             <th>Stop date</th>
                             <th>Duration</th>
+                            <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -41,10 +53,72 @@
                             <td th:text="${project.getStart()}"></td>
                             <td th:text="${project.getStop()}"></td>
                             <td th:text="${project.getDuration()}"></td>
+                            <td>
+                                <a class="btn btn-danger" data-toggle="modal" data-target="#DeleteModal" th:attrappend="data-target=${project.id}">Delete</a>
 
+                                <div id="DeleteModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" th:attrappend="id=${project.id}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <p>You are about to delete a project, this procedure is irreversible.</p>
+                                                <p>Do you want to proceed?</p>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                                <a th:href="@{/delete/{id}(id=${project.id})}" methods="DELETE"  class="btn btn-danger btn-ok">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <a th:if="${project.completed} == true" class="btn btn-warning" data-toggle="modal" data-target="#EditModal" th:attrappend="data-target=${project.id}">Edit</a>
+                                <a th:unless="${project.completed} == true" class="btn btn-warning disabled" data-toggle="modal" data-target="#EditModal" th:attrappend="data-target=${project.id}">Edit</a>
+
+                                <div id = "EditModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" th:attrappend="id=${project.id}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title justify-content-center" id="EditModalTitle">Update project</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h6 class="modal-title" id="EditModalLabel">Project name*</h6>
+                                                <br>
+                                                <form method="get" th:action="@{/edit/{id}(id=${project.id})}" th:object="${project}">
+                                                    <input type="text" class="form-control mr-sm-2" th:value="${project.name}" name="name" required/>
+                                                    <input type="hidden" class="form-control mr-sm-2" th:value="${project.start}" name="start"/>
+                                                    <input type="hidden" class="form-control mr-sm-2" th:value="${project.stop}" name="stop"/>
+                                                    <input type="hidden" class="form-control mr-sm-2" th:value="${project.duration}" name="duration"/>
+                                                    <input type="hidden" class="form-control mr-sm-2" th:value="${project.completed}" name="completed"/>
+                                                    <input type="hidden" class="form-control mr-sm-2" th:value="${project.id}" name="id"/>
+
+                                                    <div class="modal-footer justify-content-center">
+                                                        <button type="submit" class="btn btn-primary" style="border-radius: 10px">Update project</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                         </tbody>
+
                     </table>
+
+                    <p>
+                        <a data-toggle="modal" data-target="#DeleteAllModal" methods="DELETE"  class="btn btn-danger btn-ok">Delete all</a>
+                        <a th:href="@{/export}"  class="btn btn-primary">Export</a>
+                    </p>
 
                     <nav aria-label="Page navigation" class="paging">
                         <ul class="pagination" th:if="${projects.page.getTotalPages() > 1}">
@@ -73,7 +147,7 @@
 
 
         <!-- Modal -->
-        <div id = "Modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+        <div id = "StopModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -86,15 +160,37 @@
                         <h6 class="modal-title" id="ModalLabel">Project name*</h6>
                         <br>
                         <form method="post" th:action="@{/Stop}" th:object="${String}">
-                            <input type="text" class="form-control mr-sm-2" th:value="${name}" name="name"/>
+                            <input type="text" class="form-control mr-sm-2" th:value="${name}" name="name" required/>
                             <div class="modal-footer justify-content-center">
-                                <button type="submit" class="btn btn-primary">Stop Timer</button>
+                                <button type="submit" class="btn btn-primary" style="border-radius: 10px">Stop Timer</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div id="DeleteAllModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="DeleteAllModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="DeleteAllModalLabel">Confirm Delete</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>You are about to delete EVERYTHING, this procedure is irreversible.</p>
+                        <p>Are you sure about this?</p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <a th:href="@{/deleteAll}" methods="DELETE"  class="btn btn-danger btn-ok">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
         <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>

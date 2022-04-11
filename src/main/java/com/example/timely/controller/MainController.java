@@ -8,80 +8,99 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
+import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 @Controller
 public class MainController {
 
-	@Autowired
-	ProjectRepository projectRepository;
 
 	@Autowired
 	ProjectService projectService;
 
-	@RequestMapping("/")
-	public String home(@RequestParam(value = "pageNumber", required = false, defaultValue = "1") int pageNumber, @RequestParam(value = "size", required = false, defaultValue = "10") int size, Model model) {
-		model.addAttribute("projects", projectService.getProjects(pageNumber,size));
-		if (projectRepository.findAll().isEmpty())
+	@Autowired
+	ProjectRepository projectRepository;
+
+	@GetMapping("/")
+	public String home(@RequestParam(value = "pageNumber", required = false, defaultValue = "1") int pageNumber, @RequestParam(value = "size", required = false, defaultValue = "10") int size, Model model)
+	{
+		model.addAttribute("projects", projectService.getProjectsPaged(pageNumber,size));
+		if (projectService.getProjects().isEmpty())
 		{
 			model.addAttribute("completed",true);
+			model.addAttribute("empty","true");
 		}
 		else
 		{
-			Project completed = projectRepository.findAll().get(projectRepository.findAll().size()-1);
+			Project completed = projectService.getLast();
 			model.addAttribute("completed",completed.getCompleted());
+			model.addAttribute("empty","false");
 		}
 		model.addAttribute("name","");
 		return "index";
 	}
 
 
-	@RequestMapping("/Start")
-	public String start(@RequestParam(value = "pageNumber", required = false, defaultValue = "1") int pageNumber, @RequestParam(value = "size", required = false, defaultValue = "10") int size,Model model) {
+	@PostMapping("/Start")
+	public String start(Model model)
+	{
+		projectService.setStartTime();
 
-		Calendar calendar = Calendar.getInstance();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-		Project project = new Project();
-		project.setStart(formatter.format(calendar.getTime()));
-
-		projectRepository.save(project);
-		if (projectRepository.findAll().isEmpty())
+		if (projectService.getProjects().isEmpty())
 		{
 			model.addAttribute("completed",true);
 		}
 		else
 		{
-			Project completed = projectRepository.findAll().get(projectRepository.findAll().size()-1);
-			model.addAttribute("completed",completed.getCompleted());
+			model.addAttribute("completed",projectService.getLast().getCompleted());
 		}
-		model.addAttribute("projects", projectService.getProjects(pageNumber,size));
-		model.addAttribute("name",new String());
+
+		model.addAttribute("projects", projectService.getProjectsPaged(1,10));
+		model.addAttribute("name", "");
 		return "redirect:/";
 
 	}
 
-	@RequestMapping("/Stop")
-	public String stop(@RequestParam(value = "pageNumber", required = false, defaultValue = "1") int pageNumber, @RequestParam(value = "size", required = false, defaultValue = "10") int size,Model model,@ModelAttribute("name")String name) throws ParseException {
-		Calendar calendar = Calendar.getInstance();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-		Project project = projectRepository.findAll().get(projectRepository.findAll().size()-1);
-		project.setStop(formatter.format(calendar.getTime()));
-		project.setCompleted(true);
-		project.setName(name);
-		String time1 = project.getStart();
-		String time2 = project.getStop();
+	@PostMapping("/Stop")
+	public String stop(Model model,@ModelAttribute("name")String name) throws ParseException
+	{
+		projectService.setStopTime(name);
 
-		Date date1 = formatter.parse(time1);
-		Date date2 = formatter.parse(time2);
-		long difference = date2.getTime() - date1.getTime();
-		project.setDuration(Long.toString(difference));
-		projectRepository.save(project);
-		model.addAttribute("projects", projectService.getProjects(pageNumber,size));
+		model.addAttribute("projects", projectService.getProjectsPaged(1,10));
 		model.addAttribute("completed",true);
+
 		return "redirect:/";
 	}
+
+	@GetMapping ("/delete/{id}")
+	public String delete(@PathVariable Integer id)
+	{
+		projectService.deleteProjectById(id);
+		return "redirect:/";
+	}
+
+
+	@GetMapping ("/edit/{id}")
+	public String edit(@ModelAttribute("project")Project project)
+	{
+		projectService.updateProject(project);
+		return "redirect:/";
+	}
+
+	@GetMapping("/deleteAll")
+	public String deleteAll()
+	{
+		projectService.deleteAll();
+		return "redirect:/";
+	}
+
+	@GetMapping("/export")
+	public String export() throws IOException
+	{
+		projectService.export();
+		return "redirect:/";
+	}
+
 }
 
