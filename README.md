@@ -109,5 +109,5 @@ main
 | /Stop                                | add stop time and project name        | POST   |
 | /delete/{id}                         | delete project                        | DELETE |
 | /deleteAll                           | delete all projects                   | DELETE |
-| /edit/{id}                           | edit project                          | UPDATE |
+| /edit/{id}                           | edit project                          | PUT    |
 | /export                              | exports projects into a .xlsx file    | GET    |
