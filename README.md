@@ -107,7 +107,7 @@ main
 | /                                    | show main page                        | GET    |
 | /Start                               | add start time                        | POST   |
 | /Stop                                | add stop time and project name        | POST   |
-| /delete/{id}                         | delete project                        | GET    |
-| /deleteAll                           | delete all projects                   | GET    |
-| /edit/{id}                           | edit project                          | GET    |
-| /export                              | exports projects into a .xlsx file    | GET    |
+| /delete/{id}                         | delete project                        | DELETE |
+| /deleteAll                           | delete all projects                   | DELETE |
+| /edit/{id}                           | edit project                          | DELETE |
+| /export                              | exports projects into a .xlsx file    | DELETE |
